@@ -1,0 +1,17 @@
+resources:
+  pipelines:
+    grid_genie_ingest:
+      name: grid-genie-ingest
+      catalog: ${var.catalog}
+      schema: bronze
+      serverless: true
+      photon: true
+      channel: CURRENT
+      continuous: false
+      development: true
+      root_path: ../src/pipeline
+      libraries:
+        - glob:
+            include: ../src/pipeline/**
+      configuration:
+        catalog: ${var.catalog}

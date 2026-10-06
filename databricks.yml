@@ -1,0 +1,29 @@
+# Grid Genie — data platform bundle (ingestion, governance, intelligence, Lakebase, Genie)
+# The Databricks App lives in its own bundle under ./app (deployed after this one).
+bundle:
+  name: grid-genie
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for the demo (bronze / silver / gold / governance schemas)
+    default: grid_genie
+  warehouse_id:
+    description: Serverless SQL warehouse used by governance SQL and Genie
+  lakebase_project:
+    description: Lakebase Postgres Autoscaling project id
+    default: grid-genie
+  llm_endpoint:
+    description: Foundation-model endpoint used by ai_query
+    default: databricks-claude-sonnet-4-6
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      profile: DEFAULT
+    variables:
+      warehouse_id: e921c86338f3e272

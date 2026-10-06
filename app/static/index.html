@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grid Genie · Réseau de distribution</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script>document.documentElement.dataset.theme = localStorage.getItem("gg-theme") || "dark";</script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand">⚡ Grid Genie <span data-i18n="subtitle">Exploitation du réseau de distribution</span></div>
+  <div class="header-right">
+    <span id="ops-kpis" class="kpis"></span>
+    <button id="theme-toggle" class="btn ghost" title="Thème clair / sombre — Light / dark theme">☀️</button>
+    <button id="lang-toggle" class="btn ghost">EN</button>
+  </div>
+</header>
+
+<main>
+  <aside id="sidebar">
+    <section>
+      <h3 data-i18n="filters">Filtres</h3>
+      <label data-i18n="ced">Centre d'exploitation (CED)</label>
+      <select id="ced-filter"><option value="" data-i18n="all">Tous</option></select>
+      <label data-i18n="line">Ligne</label>
+      <select id="line-filter"><option value="" data-i18n="all">Toutes</option></select>
+      <label><span data-i18n="overload_min">Surcharge min. (hiver 2026)</span> : <b id="ov-val">0</b> %</label>
+      <input id="ov-threshold" type="range" min="0" max="250" step="10" value="0" />
+      <button id="select-btn" class="btn" data-i18n="select_area">▭ Sélection spatiale</button>
+      <div id="selection-result" class="card hidden"></div>
+    </section>
+
+    <section>
+      <h3 data-i18n="layers">Couches</h3>
+      <div id="layer-toggles"></div>
+      <div id="legend" class="legend"></div>
+    </section>
+
+    <section>
+      <h3><span data-i18n="ops">Opérations</span> <span class="badge" id="lb-latency">Lakebase</span></h3>
+      <div class="tabs">
+        <button class="tab active" data-tab="outages" data-i18n="tab_outages">Pannes en cours</button>
+        <button class="tab" data-tab="zones" data-i18n="tab_zones">Zones à risque</button>
+        <button class="tab" data-tab="tx" data-i18n="tab_tx">Transfos à risque</button>
+      </div>
+      <div id="ops-list" class="ops-list"></div>
+    </section>
+  </aside>
+
+  <div id="map"></div>
+
+  <aside id="chat">
+    <div class="chat-head">
+      <h3>🧞 <span data-i18n="assistant">Assistant Genie</span></h3>
+      <button id="chat-reset" class="btn ghost small" data-i18n="new_conv">Nouvelle conversation</button>
+    </div>
+    <div id="chat-log"></div>
+    <div id="chat-suggestions"></div>
+    <form id="chat-form">
+      <textarea id="chat-input" rows="2" placeholder="Posez une question… / Ask a question…"></textarea>
+      <button class="btn" type="submit">➤</button>
+    </form>
+  </aside>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

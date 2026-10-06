@@ -1,0 +1,46 @@
+# Grid Genie — Databricks App bundle (FastAPI + MapLibre GL). Deploy after the platform bundle (../databricks.yml)
+# has run, so the Genie space and the Lakebase project exist.
+bundle:
+  name: grid-genie-maplibre-app
+
+variables:
+  warehouse_id:
+    description: Serverless SQL warehouse for GeoJSON layer queries
+  genie_space_id:
+    description: Genie space created by the platform job (task genie_space)
+  lakebase_project:
+    default: grid-genie
+  lakebase_branch:
+    default: production
+  lakebase_database_id:
+    description: Lakebase database resource id (databricks postgres list-databases)
+
+resources:
+  apps:
+    grid_genie_map:
+      name: grid-genie-map
+      description: "Grid Genie — carte MapLibre du réseau de distribution, opérations Lakebase et assistant Genie (FR/EN)"
+      source_code_path: .
+      resources:
+        - name: sql-warehouse
+          sql_warehouse:
+            id: ${var.warehouse_id}
+            permission: CAN_USE
+        - name: genie-space
+          genie_space:
+            name: grid-genie
+            space_id: ${var.genie_space_id}
+            permission: CAN_RUN
+        - name: postgres
+          postgres:
+            branch: projects/${var.lakebase_project}/branches/${var.lakebase_branch}
+            database: projects/${var.lakebase_project}/branches/${var.lakebase_branch}/databases/${var.lakebase_database_id}
+            permission: CAN_CONNECT_AND_CREATE
+
+targets:
+  dev:
+    default: true
+    workspace:
+      profile: DEFAULT
+    variables:
+      warehouse_id: e921c86338f3e272

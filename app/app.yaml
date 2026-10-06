@@ -1,0 +1,12 @@
+command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+env:
+  - name: GG_CATALOG
+    value: grid_genie
+  - name: GG_PG_SCHEMA
+    value: ops
+  - name: GG_LAKEBASE_BRANCH
+    value: projects/grid-genie/branches/production
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  - name: GENIE_SPACE_ID
+    valueFrom: genie-space

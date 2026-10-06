@@ -1,0 +1,55 @@
+resources:
+  jobs:
+    grid_genie_setup:
+      name: grid-genie-setup
+      description: End-to-end build — synthetic extracts → Lakeflow (bronze/silver) → spatial gold & governance → ML/AI → Lakebase → Genie
+      max_concurrent_runs: 1
+      environments:
+        - environment_key: py
+          spec:
+            environment_version: "4"
+            dependencies:
+              - databricks-sdk>=0.146.0
+              - mlflow>=3.1
+              - scikit-learn>=1.5
+              - pyarrow
+      tasks:
+        - task_key: generate_raw_extracts
+          environment_key: py
+          spark_python_task:
+            python_file: ../src/00_generate_raw.py
+            parameters: ["--catalog", "${var.catalog}"]
+
+        - task_key: ingest_lakeflow
+          depends_on: [{task_key: generate_raw_extracts}]
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.grid_genie_ingest.id}
+            full_refresh: true  # every run regenerates a complete synthetic snapshot
+
+        - task_key: governance_spatial_gold
+          depends_on: [{task_key: ingest_lakeflow}]
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/02_governance_spatial.sql
+
+        - task_key: intelligence
+          depends_on: [{task_key: governance_spatial_gold}]
+          environment_key: py
+          spark_python_task:
+            python_file: ../src/03_intelligence.py
+            parameters: ["--catalog", "${var.catalog}", "--llm_endpoint", "${var.llm_endpoint}"]
+
+        - task_key: lakebase_sync
+          depends_on: [{task_key: intelligence}]
+          environment_key: py
+          spark_python_task:
+            python_file: ../src/04_lakebase_sync.py
+            parameters: ["--catalog", "${var.catalog}", "--lakebase_project", "${var.lakebase_project}"]
+
+        - task_key: genie_space
+          depends_on: [{task_key: intelligence}]
+          environment_key: py
+          spark_python_task:
+            python_file: ../src/05_genie_space.py
+            parameters: ["--catalog", "${var.catalog}", "--warehouse_id", "${var.warehouse_id}"]
